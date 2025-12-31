@@ -4422,6 +4422,130 @@ ${output}`;
     }
   });
 
+  // Recursive Objection-Proof Iterations API
+  app.post("/api/objection-proof/iterations", async (req: Request, res: Response) => {
+    try {
+      const { text, customInstructions, targetWordCount } = req.body;
+
+      if (!text) {
+        return res.status(400).json({
+          success: false,
+          message: "Text is required"
+        });
+      }
+
+      const { performRecursiveRewrite, getIteration } = await import('./services/recursiveObjectionProofRewrite');
+
+      const request = {
+        text,
+        customInstructions: customInstructions || null,
+        targetWordCount: targetWordCount || null,
+      };
+
+      console.log(`[RECURSIVE-OP] Starting new iteration with ${text.split(/\s+/).length} words`);
+
+      const result = await performRecursiveRewrite(request, (stage: string, message: string, progress?: number) => {
+        console.log(`[RECURSIVE-OP] ${stage}: ${message} (${progress ?? 0}%)`);
+      });
+
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          message: result.error || "Failed to process recursive rewrite"
+        });
+      }
+
+      res.json({
+        success: true,
+        iteration: result.iteration,
+        output: result.iteration?.outputText || ""
+      });
+
+    } catch (error: any) {
+      console.error("RECURSIVE OBJECTION-PROOF error:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Recursive objection-proof processing failed" 
+      });
+    }
+  });
+
+  app.get("/api/objection-proof/iterations/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { getIteration } = await import('./services/recursiveObjectionProofRewrite');
+      
+      const iteration = getIteration(id);
+      if (!iteration) {
+        return res.status(404).json({
+          success: false,
+          message: "Iteration not found"
+        });
+      }
+
+      res.json({
+        success: true,
+        iteration
+      });
+
+    } catch (error: any) {
+      console.error("GET ITERATION error:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Failed to retrieve iteration" 
+      });
+    }
+  });
+
+  app.post("/api/objection-proof/iterations/:id/refine", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { customInstructions, targetWordCount } = req.body;
+      const { getIteration, performRecursiveRewrite } = await import('./services/recursiveObjectionProofRewrite');
+
+      const previousIteration = getIteration(id);
+      if (!previousIteration) {
+        return res.status(404).json({
+          success: false,
+          message: "Previous iteration not found"
+        });
+      }
+
+      const request = {
+        text: previousIteration.outputText || previousIteration.inputText,
+        customInstructions: customInstructions || null,
+        targetWordCount: targetWordCount || null,
+        previousIterationId: id,
+      };
+
+      console.log(`[RECURSIVE-OP] Refining iteration ${id}`);
+
+      const result = await performRecursiveRewrite(request, (stage: string, message: string, progress?: number) => {
+        console.log(`[RECURSIVE-OP] ${stage}: ${message} (${progress ?? 0}%)`);
+      });
+
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          message: result.error || "Failed to refine iteration"
+        });
+      }
+
+      res.json({
+        success: true,
+        iteration: result.iteration,
+        output: result.iteration?.outputText || ""
+      });
+
+    } catch (error: any) {
+      console.error("REFINE ITERATION error:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Failed to refine iteration" 
+      });
+    }
+  });
+
   // Refine Output - Adjust word count and/or apply custom instructions
   app.post("/api/refine-output", async (req: Request, res: Response) => {
     try {
