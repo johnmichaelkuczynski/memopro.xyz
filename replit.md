@@ -43,6 +43,14 @@ The application employs a monorepo structure, separating client and server compo
             - **Input Format Detection**: Detects when reconstruction output is already in numbered format (e.g., "1. 'Claim...' Defense paragraphs")
             - **Format-Preserving Rewrite**: When numbered format detected in input, enforces EXACT item count and preserves quoted claims verbatim
             - **Direct Format Rewrite**: Bypasses section-based processing for special formats (glossaries, lists) to respect exact formatting requirements
+    - **Recursive Objection-Proof Rewrite System** (Dec 2025):
+        - **Infinite Iteration Support**: Allows unlimited rewrite iterations with custom instructions and target word count per iteration
+        - **Cross-Chunk Coherence Architecture**: Uses GlobalSkeleton extraction, smart chunking, and constrained reconstruction for long documents
+        - **Iteration Tracking**: Maintains iteration history with metadata (input/output word counts, timestamps, global skeleton)
+        - **API Endpoints**:
+            - `POST /api/objection-proof/iterations` - Start new recursive rewrite
+            - `GET /api/objection-proof/iterations/:id` - Get iteration details
+            - `POST /api/objection-proof/iterations/:id/refine` - Refine a previous iteration with new instructions
     - **Global Coherence State (GCS) System**: Architectural overhaul for coherence tracking across chunks, with mode-specific state dimensions for 8 coherence types.
     - **TextStats Component with AI Detection**: Displays word/character counts and GPTZero-powered AI detection results.
 
