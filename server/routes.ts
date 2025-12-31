@@ -4515,7 +4515,7 @@ ${output}`;
         text: previousIteration.outputText || previousIteration.inputText,
         customInstructions: customInstructions || null,
         targetWordCount: targetWordCount || null,
-        previousIterationId: id,
+        parentIterationId: id,
       };
 
       console.log(`[RECURSIVE-OP] Refining iteration ${id}`);
