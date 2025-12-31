@@ -29,6 +29,9 @@ The application employs a monorepo structure, separating client and server compo
     - **Text Model Validator**: Exclusively focused on the RECONSTRUCTION function for conservative charitable interpretation.
     - **AI Chat Assistant**: Provides conversation history and context from the Zhi Database.
     - **Conservative Reconstruction**: "Charitable Interpretation" mode for generating coherent essays articulating a text's unified argument, with advanced outline-first and cross-chunk strategies for medium and long documents.
+        - **Short Input Support** (Dec 2025): Works with ANY input length, including 1-2 line pipe-delimited position lists
+        - **Consolidated Output Mode**: Detects instructions like "WRITE ONE PARAGRAPH" or "EXPLAIN THESE STATEMENTS" and generates unified single-output responses instead of per-position defense blocks
+        - **Position List Detection**: Threshold lowered from 10+ lines to 1+ lines for pipe-delimited format recognition
     - **Full Suite Pipeline**: One-click execution of Reconstruction, Objections, and Objection-Proof Final Version.
     - **Objections Function**: Generates 25 likely objections with compelling counter-arguments. For large documents (1,200+ words), uses outline-first approach that extracts argument structure first, then generates categorized objections (logical, evidential, practical, audience-specific, methodological) with severity ratings.
     - **Generate Objection-Proof Version (Bullet-Proof Rewrite)**: Rewrites text to preemptively address identified objections. Enhanced with:
